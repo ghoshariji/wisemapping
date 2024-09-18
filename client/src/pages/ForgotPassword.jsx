@@ -77,3 +77,134 @@ function ForgotPassword() {
 }
 
 export default ForgotPassword;
+
+
+
+// import React, { useCallback, useRef, useState, useEffect } from 'react';
+// import {
+//   ReactFlow,
+//   Controls,
+//   Panel,
+//   useStoreApi,
+//   useReactFlow,
+//   ReactFlowProvider,
+//   ConnectionLineType,
+// } from '@xyflow/react';
+// import { shallow } from 'zustand/shallow';
+
+// import useStore from '../hooks/store';
+// import MindMapNode from '../components/MindMapNode';
+// import MindMapEdge from '../components/MindMapEdge';
+
+// import '@xyflow/react/dist/style.css';
+
+// const selector = (state) => ({
+//   nodes: state.nodes,
+//   edges: state.edges,
+//   onNodesChange: state.onNodesChange,
+//   onEdgesChange: state.onEdgesChange,
+//   addChildNode: state.addChildNode,
+// });
+
+// const nodeTypes = {
+//   mindmap: MindMapNode,
+// };
+
+// const edgeTypes = {
+//   mindmap: MindMapEdge,
+// };
+
+// const nodeOrigin = [0.5, 0.5];
+// const connectionLineStyle = { stroke: '#F6AD55', strokeWidth: 3 };
+// const defaultEdgeOptions = { style: connectionLineStyle, type: 'mindmap' };
+
+// function CanvasPage() {
+//   const { nodes, edges, onNodesChange, onEdgesChange, addChildNode } = useStore(
+//     selector,
+//     shallow
+//   );
+//   const connectingNodeId = useRef(null);
+//   const store = useStoreApi();
+//   const { screenToFlowPosition, getIntersectingNodes } = useReactFlow();
+//   const [targetNode, setTargetNode] = useState(null);
+
+//   const getChildNodePosition = (event, parentNode) => {
+//     const { domNode } = store.getState();
+
+//     if (!domNode || !parentNode?.internals?.positionAbsolute || !parentNode?.measured?.width || !parentNode?.measured?.height) {
+//       return;
+//     }
+
+//     const isTouchEvent = 'touches' in event;
+//     const x = isTouchEvent ? event.touches[0].clientX : event.clientX;
+//     const y = isTouchEvent ? event.touches[0].clientY : event.clientY;
+//     const panePosition = screenToFlowPosition({ x, y });
+
+//     return {
+//       x: panePosition.x - parentNode.internals.positionAbsolute.x + parentNode.measured.width / 2,
+//       y: panePosition.y - parentNode.internals.positionAbsolute.y + parentNode.measured.height / 2,
+//     };
+//   };
+
+//   const onConnectStart = useCallback((_, { nodeId }) => {
+//     connectingNodeId.current = nodeId;
+//   }, []);
+
+//   const onConnectEnd = useCallback(
+//     (event) => {
+//       const { nodeLookup } = store.getState();
+//       const targetIsPane = event.target.classList.contains('react-flow__pane');
+
+//       if (targetIsPane && connectingNodeId.current) {
+//         const parentNode = nodeLookup.get(connectingNodeId.current);
+//         const childNodePosition = getChildNodePosition(event, parentNode);
+
+//         if (parentNode && childNodePosition) {
+//           addChildNode(parentNode, childNodePosition);
+//         }
+//       }
+//     },
+//     [getChildNodePosition]
+//   );
+
+//   // Collision detection on node drag
+//   const onNodeDrag = (event, node) => {
+//     const intersectingNodes = getIntersectingNodes(node);
+//     setTargetNode(intersectingNodes.length > 0 ? intersectingNodes[0] : null);
+//   };
+
+//   useEffect(() => {
+//     if (targetNode) {
+//       // Handle collision logic (like snapping back, etc.)
+//       console.log('Collision detected with node:', targetNode.id);
+//     }
+//   }, [targetNode]);
+
+//   return (
+//     <div className='h-screen w-screen'>
+//       <ReactFlow
+//         nodes={nodes}
+//         edges={edges}
+//         onNodesChange={onNodesChange}
+//         onEdgesChange={onEdgesChange}
+//         connectionMode={ConnectionLineType.SmoothStep}
+//         edgeTypes={edgeTypes}
+//         onConnectStart={onConnectStart}
+//         onConnectEnd={onConnectEnd}
+//         onNodeDrag={onNodeDrag} // Collision detection during drag
+//         nodeOrigin={nodeOrigin}
+//         // connectionLineStyle={connectionLineStyle}
+//         defaultEdgeOptions={defaultEdgeOptions}
+//         connectionLineType={ConnectionLineType.Straight}
+        
+//       >
+//         <Controls showInteractive={false} />
+//         <Panel position="top-left" className="header">
+//           Welcome To Wisemapping
+//         </Panel>
+//       </ReactFlow>
+//     </div>
+//   );
+// }
+
+// export default CanvasPage;
