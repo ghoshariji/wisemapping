@@ -9,7 +9,7 @@ import ReactFlow, {
 } from "reactflow";
 import "reactflow/dist/style.css";
 import { PlusCircle } from "lucide-react";
-import { Handle } from "@xyflow/react";
+import { Handle } from "reactflow";
 import Toolbar from "../components/Toolbar";
 
 const initialNodes = [
@@ -43,22 +43,31 @@ function CustomNode({ id, data }) {
   };
 
   return (
-    <div className="px-4 py-2 shadow-md rounded-md bg-white border-2 border-stone-400">
+    <div
+      className="px-4 py-2 shadow-md rounded-md bg-white border-2 border-stone-400"
+      style={{ width: "200px", height: "auto" }} // Ensure fixed width for the node
+    >
       <div className="flex items-center">
-        <div className="ml-2">
+        <div className="ml-2 w-full">
           {isEditing ? (
             <input
               type="text"
               value={label}
               onChange={handleInputChange}
               onBlur={handleInputBlur}
-              className="bg-white border-2 border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="bg-white border-2 border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500 w-full"
+              style={{ width: "100%" }} // Ensure the input field has a fixed width
               autoFocus
             />
           ) : (
             <div
-              className="text-lg font-bold"
+              className="text-lg font-bold w-full cursor-pointer"
               onDoubleClick={handleDoubleClick}
+              style={{
+                overflow: "hidden",
+                whiteSpace: "nowrap",
+                textOverflow: "ellipsis",
+              }} // Prevent content overflow
             >
               {label}
             </div>
@@ -89,7 +98,9 @@ export default function CanvasPage() {
   const onConnect = useCallback(
     (params) => {
       console.log("Connecting:", params);
-      setEdges((eds) => addEdge(params, eds));
+      setEdges((eds) =>
+        addEdge({ ...params, animated: true, type: "smoothstep" }, eds)
+      );
     },
     [setEdges]
   );
@@ -100,35 +111,19 @@ export default function CanvasPage() {
       if (!parentNode) return;
 
       const newNodeId = (nodes.length + 1).toString();
-      let newNodePosition;
+      const childNodeCount = edges.filter(
+        (edge) => edge.source === parentId
+      ).length;
 
-      // Check if the parent node has any edges
-      const parentEdges = edges.filter((edge) => edge.source === parentId);
-      if (parentEdges.length === 0) {
-        // If no edges, position the new node to the right
-        newNodePosition = {
-          x: parentNode.position.x + 200,
-          y: parentNode.position.y,
-        };
-      } else {
-        // If edges exist, position the new node above or below
-        const existingChildNodes = nodes.filter((node) => {
-          const edge = edges.find(
-            (edge) => edge.source === parentId && edge.target === node.id
-          );
-          return edge !== undefined;
-        });
+      const nodeSpacing = 100;
 
-        // Alternate between above and below
-        const newY =
-          existingChildNodes.length % 2 === 0
-            ? parentNode.position.y - 100
-            : parentNode.position.y + 100;
-        newNodePosition = {
-          x: parentNode.position.x + 200,
-          y: newY,
-        };
-      }
+      const newNodePosition = {
+        x: parentNode.position.x + 200,
+        y:
+          parentNode.position.y +
+          (childNodeCount % 2 === 0 ? -nodeSpacing : nodeSpacing) *
+            Math.ceil((childNodeCount + 1) / 2),
+      };
 
       const newNode = {
         id: newNodeId,
@@ -140,18 +135,17 @@ export default function CanvasPage() {
       };
 
       const newEdge = {
-        id: `e${parentId}-${newNodeId}`, // Fixed here
+        id: ` e${parentId}-${newNodeId}`,
         source: parentId,
         target: newNodeId,
         type: "smoothstep",
         animated: true,
       };
 
-      // Update nodes and edges state
       setNodes((nds) => nds.concat(newNode));
       setEdges((eds) => eds.concat(newEdge));
     },
-    [nodes, edges]
+    [nodes, edges, setNodes, setEdges]
   );
 
   const onLabelChange = useCallback(
@@ -168,7 +162,6 @@ export default function CanvasPage() {
   );
 
   const handleAddNode = () => {
-    // Logic to add a new node at a default position
     const newNodeId = (nodes.length + 1).toString();
     const newNode = {
       id: newNodeId,
@@ -186,19 +179,14 @@ export default function CanvasPage() {
   };
 
   const handleDeleteNode = () => {
-    // Logic to delete the selected node
-    // You might want to keep track of selected nodes in state
-    // For simplicity's sake here we won't implement selection logic
     console.log("Delete node functionality not implemented");
   };
 
   const handleSave = () => {
-    // Logic to save the current state of nodes and edges
     console.log("Save functionality not implemented");
   };
 
   const handleExport = () => {
-    // Logic to export the current state of nodes and edges
     console.log("Export functionality not implemented");
   };
 
@@ -219,7 +207,7 @@ export default function CanvasPage() {
         edges={edges}
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
-        onConnect={onConnect} // Ensure this is correctly set
+        onConnect={onConnect}
         nodeTypes={nodeTypes}
         fitView
       >
