@@ -2,36 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Global reset */
-html, body, #root {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  height: 100%;
-}
-
-.canvas-page {
-  display: flex;
-  height: 100vh; /* Full viewport height */
-  width: 100vw; /* Full viewport width */
-  margin: 0;
-  padding: 0;
-}
-
-
-.canvas-page {
-  display: flex;
-  height: 100vh; /* Full viewport height */
-  width: 100vw; /* Full viewport width */
-  margin: 0;
-  padding: 0;
-}
-
-.toolbar {
-  position: sticky;
-  top: 0;
-  z-index: 10;
-  background-color: #f8f8f8;
-  border-right: 1px solid #ddd;
-
+html {
+  padding: 30px;
 }
