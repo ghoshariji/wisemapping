@@ -67,7 +67,7 @@ function CustomNode({ id, data }) {
                 overflow: "hidden",
                 whiteSpace: "nowrap",
                 textOverflow: "ellipsis",
-              }} // Prevent content overflow
+              }} // Prevent content overflo
             >
               {label}
             </div>
