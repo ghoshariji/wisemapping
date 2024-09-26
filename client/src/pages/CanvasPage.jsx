@@ -105,26 +105,36 @@ export default function CanvasPage() {
     [setEdges]
   );
 
+  
   const addChildNode = useCallback(
     (parentId) => {
       const parentNode = nodes.find((node) => node.id === parentId);
       if (!parentNode) return;
-
+  
       const newNodeId = (nodes.length + 1).toString();
-      const childNodeCount = edges.filter(
-        (edge) => edge.source === parentId
-      ).length;
-
-      const nodeSpacing = 100;
-
-      const newNodePosition = {
-        x: parentNode.position.x + 200,
-        y:
-          parentNode.position.y +
-          (childNodeCount % 2 === 0 ? -nodeSpacing : nodeSpacing) *
-            Math.ceil((childNodeCount + 1) / 2),
-      };
-
+      const childNodeCount = edges.filter((edge) => edge.source === parentId).length;
+  
+      const nodeSpacingX = 200; // Horizontal spacing for new nodes
+      const baseNodeSpacingY = 100; // Base vertical spacing for nodes
+  
+      let newNodePosition;
+  
+      if (childNodeCount === 0) {
+        // First child node, place directly to the right
+        newNodePosition = {
+          x: parentNode.position.x + nodeSpacingX + 50,
+          y: parentNode.position.y, // Same Y-axis as parent
+        };
+      } else {
+        // For additional child nodes, calculate a larger yOffset
+        const direction = childNodeCount % 2 === 0 ? -1 : 1; // Alternate between top (-1) and bottom (1)
+        const yOffset = direction * baseNodeSpacingY * (Math.floor((childNodeCount + 1) / 2)); 
+        newNodePosition = {
+          x: parentNode.position.x + nodeSpacingX, // Always position to the right
+          y: parentNode.position.y + yOffset, // Larger top or bottom based on count
+        };
+      }
+  
       const newNode = {
         id: newNodeId,
         type: "custom",
@@ -133,21 +143,26 @@ export default function CanvasPage() {
         sourcePosition: Position.Right,
         targetPosition: Position.Left,
       };
-
+  
       const newEdge = {
-        id: ` e${parentId}-${newNodeId}`,
+        id: `e${parentId}-${newNodeId}`,
         source: parentId,
         target: newNodeId,
         type: "smoothstep",
-        animated: true,
+        animated: true, // Animation for better visualization of edge connection
       };
-
+  
+      // Update the state with the new node and edge
       setNodes((nds) => nds.concat(newNode));
       setEdges((eds) => eds.concat(newEdge));
     },
     [nodes, edges, setNodes, setEdges]
   );
-
+  
+  
+  
+  
+  
   const onLabelChange = useCallback(
     (nodeId, newLabel) => {
       setNodes((nds) =>
